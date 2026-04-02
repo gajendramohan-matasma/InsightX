@@ -1,0 +1,67 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: jd_analytics
+      POSTGRES_PASSWORD: jd_analytics_dev
+      POSTGRES_DB: jd_financial_analytics
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jd_analytics"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://jd_analytics:jd_analytics_dev@postgres:5432/jd_financial_analytics
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ANAPLAN_CLIENT_ID: ${ANAPLAN_CLIENT_ID:-}
+      ANAPLAN_CLIENT_SECRET: ${ANAPLAN_CLIENT_SECRET:-}
+      ANAPLAN_API_BASE_URL: https://api.anaplan.com/2/0
+      ANAPLAN_AUTH_URL: https://us1a.app.anaplan.com/oauth/token
+      POWERBI_TENANT_ID: ${POWERBI_TENANT_ID:-}
+      POWERBI_CLIENT_ID: ${POWERBI_CLIENT_ID:-}
+      POWERBI_CLIENT_SECRET: ${POWERBI_CLIENT_SECRET:-}
+      AZURE_AD_TENANT_ID: ${AZURE_AD_TENANT_ID:-}
+      AZURE_AD_CLIENT_ID: ${AZURE_AD_CLIENT_ID:-}
+      AZURE_AD_AUDIENCE: ${AZURE_AD_AUDIENCE:-api://jd-financial-analytics}
+      CORS_ORIGINS: http://localhost:5001
+      ENVIRONMENT: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend/app:/app/app
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      AUTH_SECRET: ${AUTH_SECRET:-dev-secret-change-in-production-32chars}
+      AUTH_MICROSOFT_ENTRA_ID_ID: ${AUTH_MICROSOFT_ENTRA_ID_ID:-}
+      AUTH_MICROSOFT_ENTRA_ID_SECRET: ${AUTH_MICROSOFT_ENTRA_ID_SECRET:-}
+      AUTH_MICROSOFT_ENTRA_ID_TENANT_ID: ${AUTH_MICROSOFT_ENTRA_ID_TENANT_ID:-}
+      NEXT_PUBLIC_API_URL: http://localhost:9000
+      BACKEND_URL: http://backend:9000
+      AUTH_TRUST_HOST: "true"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

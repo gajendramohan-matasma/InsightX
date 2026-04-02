@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jd-analytics-backend
+  labels:
+    app: jd-analytics-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jd-analytics-backend
+  template:
+    metadata:
+      labels:
+        app: jd-analytics-backend
+    spec:
+      containers:
+        - name: backend
+          image: jdanalyticsacr.azurecr.io/jd-analytics-backend:latest
+          ports:
+            - containerPort: 9000
+          envFrom:
+            - configMapRef:
+                name: jd-analytics-config
+            - secretRef:
+                name: jd-analytics-secrets
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 9000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 9000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jd-analytics-backend
+spec:
+  selector:
+    app: jd-analytics-backend
+  ports:
+    - port: 9000
+      targetPort: 9000
+  type: ClusterIP

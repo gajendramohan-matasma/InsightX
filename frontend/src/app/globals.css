@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-jd-green: #367C2B;
+  --color-jd-yellow: #FFDE00;
+  --color-jd-green-dark: #2A5F22;
+  --color-jd-green-light: #4A9A3A;
+
+  --color-jd-green-50: #f0f9ee;
+  --color-jd-green-100: #daf0d5;
+  --color-jd-green-200: #b7e2ad;
+  --color-jd-green-300: #88cc79;
+  --color-jd-green-400: #5fb44e;
+  --color-jd-green-500: #4A9A3A;
+  --color-jd-green-600: #367C2B;
+  --color-jd-green-700: #2A5F22;
+  --color-jd-green-800: #1f4a19;
+  --color-jd-green-900: #193d15;
+
+  --color-jd-yellow-50: #fffce5;
+  --color-jd-yellow-100: #fff8b3;
+  --color-jd-yellow-200: #fff180;
+  --color-jd-yellow-300: #FFE94D;
+  --color-jd-yellow-400: #FFDE00;
+  --color-jd-yellow-500: #e6c800;
+  --color-jd-yellow-600: #b39c00;
+  --color-jd-yellow-700: #807000;
+
+  --color-background: #ffffff;
+  --color-foreground: #1a1a2e;
+  --color-muted: #f8f9fa;
+  --color-muted-foreground: #6b7280;
+  --color-border: #e5e7eb;
+  --color-ring: #367C2B;
+  --color-destructive: #dc2626;
+  --color-destructive-foreground: #ffffff;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer components {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-jd-green-200) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: var(--color-jd-green-200);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-jd-green-400);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.streaming-cursor::after {
+  content: "\25AE";
+  display: inline;
+  animation: cursor-blink 1s step-end infinite;
+  color: var(--color-jd-green);
+  margin-left: 2px;
+}
